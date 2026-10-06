@@ -1,0 +1,21 @@
+name: Restock watcher
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes (GitHub's fastest)
+  workflow_dispatch:        # lets you press "Run workflow" to test
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install playwright requests
+      - run: playwright install --with-deps chromium
+      - run: python check_stock.py
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
